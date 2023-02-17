@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "444406240327",
+    "project_id": "data-storage-34b83",
+    "storage_bucket": "data-storage-34b83.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444406240327:android:9a01a812d056ccaf22cd62",
+        "android_client_info": {
+          "package_name": "com.example.datastorage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444406240327-cf2d8igje2uh9tdsodc9rhi973ahk61g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4i8dpzC4zuk0ReWjrxBGE28Kqe6T039k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444406240327-cf2d8igje2uh9tdsodc9rhi973ahk61g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

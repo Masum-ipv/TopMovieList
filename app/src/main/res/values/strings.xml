@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Top Movie List</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="register_now"><u>Register Now!</u></string>
+    <string name="shared_preferences">Data From Shared Preferences</string>
+    <string name="room_database">Data From Room Database</string>
+    <string name="firebase">Data From Firebase</string>
+    <string name="input_data">Type in here...</string>
+    <string name="favorite">Favorite</string>
+</resources>
