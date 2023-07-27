@@ -1,6 +1,6 @@
 package com.example.datastorage.Repository;
 
-import android.content.Context;
+import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,37 +20,29 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieRepository {
-    private static Context mContext;
+    private Application application;
     private static MovieRepository movieRepositoryInstance;
     private static MovieDao movieDao;
-    private MovieModel movieModel;
     private List<Result> mResult;
-    private MutableLiveData mutableLiveData;
+    private MutableLiveData<List<Result>> mutableLiveData = new MutableLiveData<>();
 
-    public static MovieRepository getMovieRepositoryInstance(Context context) {
-        if (movieRepositoryInstance == null) {
-            MovieDatabase db = MovieDatabase.getDatabase(context);
-            movieDao = db.movieDao();
-            mContext = context;
-            movieRepositoryInstance = new MovieRepository();
-        }
-        return movieRepositoryInstance;
+    public MovieRepository(Application application) {
+        this.application = application;
+        MovieDatabase db = MovieDatabase.getDatabase(application.getApplicationContext());
+        movieDao = db.movieDao();
     }
 
     public MutableLiveData<List<Result>> getTopRatedMovieList() {
-        if (mutableLiveData == null) {
-            mutableLiveData = new MutableLiveData();
-        }
-
-
-        ApiServices apiServices = RetrofitInstance.getRetrofitInstance().create(ApiServices.class);
+        ApiServices apiServices = RetrofitInstance.getRetrofitInstance();
         Call<MovieModel> call = apiServices.getTopRatedMovieList();
         call.enqueue(new Callback<MovieModel>() {
             @Override
             public void onResponse(Call<MovieModel> call, Response<MovieModel> response) {
-                movieModel = response.body();
-                mResult = movieModel.getResults();
-                mutableLiveData.postValue(mResult);
+                MovieModel movieModel = response.body();
+                if (movieModel != null && movieModel.getResults() != null) {
+                    mResult = movieModel.getResults();
+                    mutableLiveData.postValue(mResult);
+                }
                 new insertAsyncTask(movieDao).execute(mResult);
             }
 

@@ -1,11 +1,6 @@
 package com.example.datastorage.Fragments;
 
-import androidx.fragment.app.Fragment;
-
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -17,18 +12,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.example.datastorage.Activities.DashboardActivity;
 import com.example.datastorage.R;
 import com.example.datastorage.Utils.Helper;
-import com.example.datastorage.Utils.SharedPreference;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.text.SimpleDateFormat;
 
 public class SignInFragment extends Fragment implements View.OnClickListener {
 
@@ -59,9 +53,8 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.registerButton) {
-            getParentFragmentManager().beginTransaction().
-                    replace(R.id.fragmentContainer, new SignUpFragment()).
-                    commit();
+            Navigation.findNavController(view)
+                    .navigate(SignInFragmentDirections.signInFragmentToSignUpFragment());
         } else if (view.getId() == R.id.signInButton) {
             if (Helper.isNetworkAvailable(getContext())) {
                 userLogin();

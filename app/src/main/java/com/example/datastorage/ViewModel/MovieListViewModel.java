@@ -17,7 +17,7 @@ public class MovieListViewModel extends AndroidViewModel {
 
     public MovieListViewModel(@NonNull Application application) {
         super(application);
-        movieRepository = MovieRepository.getMovieRepositoryInstance(application);
+        movieRepository = new MovieRepository(application);
     }
 
     public MutableLiveData<List<Result>> getTopRatedMovieList() {

@@ -16,7 +16,5 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Hide title bar from signin and signup screen.
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                new SignInFragment()).commit();
     }
 }

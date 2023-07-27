@@ -7,6 +7,6 @@ import retrofit2.http.GET;
 
 public interface ApiServices {
 
-    @GET("3/movie/top_rated?api_key=3060508c8943af543224a8152841f34a")
+    @GET("movie/top_rated")
     Call<MovieModel> getTopRatedMovieList();
 }

@@ -1,5 +1,7 @@
 package com.example.datastorage.Adapter;
 
+import static com.example.datastorage.Utils.Helper.IMAGE_PATH;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.datastorage.Models.Result;
 import com.example.datastorage.R;
-import com.example.datastorage.Utils.Helper;
 
 import java.util.List;
 
@@ -39,19 +40,13 @@ public class TopMovieListAdapter extends RecyclerView.Adapter<TopMovieListAdapte
         holder.mRating.setText("Rating: " + mList.get(position).getVoteAverage().toString());
         holder.mReleaseDate.setText("Release Date: " + mList.get(position).getReleaseDate());
 
-        String imageBaseUrl = Helper.getConfigValue(context, "IMAGE_PATH");
-        String imagePath = imageBaseUrl + mList.get(position).getPosterPath();
+        String imagePath = IMAGE_PATH + mList.get(position).getPosterPath();
         Glide.with(context).load(imagePath).into(holder.mImageView);
     }
 
     @Override
     public int getItemCount() {
-        if (this.mList != null) {
-            return mList.size();
-        } else {
-            return 0;
-        }
-
+        return mList == null ? 0 : mList.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
