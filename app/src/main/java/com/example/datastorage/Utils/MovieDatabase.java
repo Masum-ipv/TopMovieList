@@ -16,19 +16,15 @@ public abstract class MovieDatabase extends RoomDatabase {
 
     private static MovieDatabase INSTANCE;
 
-    public static MovieDatabase getDatabase(final Context context) {
+    public static synchronized MovieDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            synchronized (MovieDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    MovieDatabase.class, "movie_database")
-                            // Wipes and rebuilds instead of migrating
-                            // if no Migration object.
-                            // Migration is not part of this practical.
-                            .fallbackToDestructiveMigration()
-                            .build();
-                }
-            }
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                            MovieDatabase.class, "movie_database")
+                    // Wipes and rebuilds instead of migrating
+                    // if no Migration object.
+                    // Migration is not part of this practical.
+                    .fallbackToDestructiveMigration()
+                    .build();
         }
         return INSTANCE;
     }

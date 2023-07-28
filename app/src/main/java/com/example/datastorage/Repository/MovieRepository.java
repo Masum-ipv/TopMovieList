@@ -1,8 +1,8 @@
 package com.example.datastorage.Repository;
 
 import android.app.Application;
-import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -14,6 +14,8 @@ import com.example.datastorage.Network.RetrofitInstance;
 import com.example.datastorage.Utils.MovieDatabase;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,7 +23,6 @@ import retrofit2.Response;
 
 public class MovieRepository {
     private Application application;
-    private static MovieRepository movieRepositoryInstance;
     private static MovieDao movieDao;
     private List<Result> mResult;
     private MutableLiveData<List<Result>> mutableLiveData = new MutableLiveData<>();
@@ -43,49 +44,58 @@ public class MovieRepository {
                     mResult = movieModel.getResults();
                     mutableLiveData.postValue(mResult);
                 }
-                new insertAsyncTask(movieDao).execute(mResult);
+//                new insertAsyncTask(movieDao).execute(mResult);
             }
 
             @Override
             public void onFailure(Call<MovieModel> call, Throwable t) {
-                Log.d("MovieRepository", "Calling Room-database");
-                new getAsyncTask(movieDao).execute();//On failure calling local room-database
+//                Log.d("MovieRepository", "Calling Room-database");
+//                new getAsyncTask(movieDao).execute();//On failure calling local room-database
             }
         });
 
         return mutableLiveData;
     }
 
-    private class insertAsyncTask extends AsyncTask<List<Result>, Void, Void> {
-        private MovieDao asyncTaskDao;
+    public void insertTopRatedMovieListDB(List<Result> results) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                //On Background
+                movieDao.insert(results);
 
-        public insertAsyncTask(MovieDao dao) {
-            this.asyncTaskDao = dao;
-        }
+                //On Post Execution
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
 
-        @Override
-        protected Void doInBackground(List<Result>... movies) {
-            asyncTaskDao.insert(movies[0]);
-            return null;
-        }
+                    }
+                });
+            }
+        });
     }
 
-    private class getAsyncTask extends AsyncTask<Void, Void, List<Result>> {
-        private MovieDao asyncTaskDao;
+    public MutableLiveData<List<Result>> getTopRatedMovieListDB() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                //On Background
+                mResult = movieDao.getAllMovies();
+                mutableLiveData.postValue(mResult);
 
-        public getAsyncTask(MovieDao dao) {
-            this.asyncTaskDao = dao;
-        }
+                //On Post Execution
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
 
-        @Override
-        protected List<Result> doInBackground(Void... voids) {
-            return asyncTaskDao.getAllMovies();
-        }
-
-        @Override
-        protected void onPostExecute(List<Result> results) {
-            super.onPostExecute(results);
-            mutableLiveData.postValue(results);
-        }
+                    }
+                });
+            }
+        });
+        return mutableLiveData;
     }
 }

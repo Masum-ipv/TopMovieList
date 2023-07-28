@@ -1,10 +1,12 @@
 package com.example.datastorage.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import static com.example.datastorage.Utils.Helper.SHARED_PREF_KEY;
+import static com.example.datastorage.Utils.Helper.TAG;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +14,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.datastorage.Models.UserProfile;
 import com.example.datastorage.R;
@@ -24,18 +29,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MyProfileActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     DatabaseReference databaseReference;
 
-    TextView fullName, lastLogin;
+    TextView fullName;
     TextInputEditText fullNameHome, emailHome, phoneHome;
     Button profileUpdate;
     ProgressBar profileProgressBar;
     UserProfile userProfile = new UserProfile();
-    SharedPreference sharedPreference = new SharedPreference(this);
-    String sharedPrefKey = "loginTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +54,12 @@ public class MyProfileActivity extends AppCompatActivity {
 
         profileUpdate = findViewById(R.id.profile_update);
         fullName = findViewById(R.id.full_name);
-        lastLogin = findViewById(R.id.last_login);
         fullNameHome = findViewById(R.id.full_name_home);
         emailHome = findViewById(R.id.homeEmail);
         phoneHome = findViewById(R.id.homePhone);
         mAuth = FirebaseAuth.getInstance();
         profileProgressBar = findViewById(R.id.profileProgressbar);
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        String data = sharedPreference.GetSharedPreferenceData(sharedPrefKey);
-        lastLogin.setText("Currently Watching: " + data);
         setDataFirebase();
 
         profileUpdate.setOnClickListener(new View.OnClickListener() {

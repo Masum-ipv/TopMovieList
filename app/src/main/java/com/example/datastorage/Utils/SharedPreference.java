@@ -2,11 +2,8 @@ package com.example.datastorage.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.text.SimpleDateFormat;
 
 
 public class SharedPreference extends AppCompatActivity {
@@ -18,13 +15,11 @@ public class SharedPreference extends AppCompatActivity {
         this.context = context;
     }
 
-    public void SaveSharedPreference(String[] key, String[] value) {
+    public void SaveSharedPreference(String key, String value) {
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPrefDb, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        for (int i = 0; i < key.length; i++) {
-            editor.putString(key[i], value[i]);
-        }
+        editor.putString(key, value);
         editor.apply();
     }
 

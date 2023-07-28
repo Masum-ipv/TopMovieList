@@ -1,15 +1,19 @@
 package com.example.datastorage.Activities;
 
+import static com.example.datastorage.Utils.Helper.SHARED_PREF_KEY;
+import static com.example.datastorage.Utils.Helper.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.datastorage.Adapter.TopMovieListAdapter;
@@ -19,13 +23,13 @@ import com.example.datastorage.Utils.SharedPreference;
 import com.example.datastorage.ViewModel.MovieListViewModel;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    String roomDbName = "userRoomDb", userInput = "";
+    //    String roomDbName = "userRoomDb", userInput = "";
     SharedPreference sharedPreference = new SharedPreference(this);
-    String sharedPrefKey = "loginTime";
     private RecyclerView recyclerView;
     private MovieListViewModel movieListViewModel;
     private TopMovieListAdapter topMovieListAdapter;
@@ -74,8 +78,10 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        String timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date());
-        sharedPreference.SaveSharedPreference(new String[]{sharedPrefKey}, new String[]{timeStamp});
+        Date date = new Date();
+        String result = new SimpleDateFormat("yyyy-MM-dd").format(date);
+        Log.d(TAG, "onPause: " + result);
+        sharedPreference.SaveSharedPreference(SHARED_PREF_KEY, String.valueOf(result));
     }
 
 /*    private void showData(EditText editText) {

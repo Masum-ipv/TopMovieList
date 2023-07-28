@@ -23,4 +23,12 @@ public class MovieListViewModel extends AndroidViewModel {
     public MutableLiveData<List<Result>> getTopRatedMovieList() {
         return movieRepository.getTopRatedMovieList();
     }
+
+    public MutableLiveData<List<Result>> getTopRatedMovieListDB() {
+        return movieRepository.getTopRatedMovieListDB();
+    }
+
+    public void insertTopRatedMovieListDB(List<Result> results) {
+        movieRepository.insertTopRatedMovieListDB(results);
+    }
 }
