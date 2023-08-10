@@ -1,48 +1,46 @@
 package com.example.datastorage.Activities;
 
-import static com.example.datastorage.Utils.Helper.SHARED_PREF_KEY;
-import static com.example.datastorage.Utils.Helper.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.datastorage.Models.UserProfile;
+import com.example.datastorage.Models.UserModel;
 import com.example.datastorage.R;
-import com.example.datastorage.Utils.SharedPreference;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class MyProfileActivity extends AppCompatActivity {
 
-    FirebaseAuth mAuth;
-    DatabaseReference databaseReference;
+    FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference collectionReference = db.collection("Users");
+    private FirebaseUser currentUser;
+    private final String USER_ID = "userId";
+    private final String USER_NAME = "userName";
+    private final String USER_Number = "userNumber";
 
     TextView fullName;
     TextInputEditText fullNameHome, emailHome, phoneHome;
     Button profileUpdate;
     ProgressBar profileProgressBar;
-    UserProfile userProfile = new UserProfile();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,54 +55,68 @@ public class MyProfileActivity extends AppCompatActivity {
         fullNameHome = findViewById(R.id.full_name_home);
         emailHome = findViewById(R.id.homeEmail);
         phoneHome = findViewById(R.id.homePhone);
-        mAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
         profileProgressBar = findViewById(R.id.profileProgressbar);
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        setDataFirebase();
 
         profileUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String uid = mAuth.getCurrentUser().getUid();
-                String username = fullNameHome.getText().toString().trim();
-                String phone = phoneHome.getText().toString().trim();
+                String uid = currentUser.getUid();
+                String userName = fullNameHome.getText().toString().trim();
+                String userNumber = phoneHome.getText().toString().trim();
 
-                if (username.isEmpty()) {
+                UserModel user = UserModel.getInstance();
+                user.setUserName(userName);
+                user.setUserNumber(userNumber);
+
+                if (userName.isEmpty()) {
                     fullNameHome.setError("Enter a valid full Name", null);
                     fullNameHome.requestFocus();
                     return;
                 }
-                if (phone.isEmpty() || phone.length() < 11) {
+                if (userNumber.isEmpty() || userNumber.length() < 11) {
                     phoneHome.setError("Enter a valid mobile number", null);
                     phoneHome.requestFocus();
                     return;
                 }
-
-                UserProfile userProfile = new UserProfile(username, phone);
-                databaseReference.child(uid).setValue(userProfile);
+                collectionReference
+                        .whereEqualTo(USER_ID, currentUser.getUid())
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        collectionReference.document(document.getId()).set(user);
+                                    }
+                                }
+                            }
+                        });
             }
         });
     }
 
-    private void setDataFirebase() {
+    @Override
+    protected void onStart() {
+        super.onStart();
         profileProgressBar.setVisibility(View.VISIBLE);
-        String uid = mAuth.getCurrentUser().getUid();
-        databaseReference.child(uid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userProfile = snapshot.getValue(UserProfile.class);
-                fullName.setText(userProfile.getUsername());
-                fullNameHome.setText(userProfile.getUsername());
-                phoneHome.setText(userProfile.getPhone());
-                emailHome.setText(mAuth.getCurrentUser().getEmail());
-                profileProgressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getApplicationContext(), "Failed to Load User Data", Toast.LENGTH_SHORT).show();
-            }
-        });
+        collectionReference
+                .whereEqualTo(USER_ID, currentUser.getUid())
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (value != null) {
+                            for (QueryDocumentSnapshot snapshot : value) {
+                                fullName.setText(snapshot.getString(USER_NAME));
+                                fullNameHome.setText(snapshot.getString(USER_NAME));
+                                phoneHome.setText(snapshot.getString(USER_Number));
+                                emailHome.setText(currentUser.getEmail());
+                                profileProgressBar.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
@@ -116,7 +128,7 @@ public class MyProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.signOutMenuId) {
-            FirebaseAuth.getInstance().signOut();
+            firebaseAuth.signOut();
             this.finish();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

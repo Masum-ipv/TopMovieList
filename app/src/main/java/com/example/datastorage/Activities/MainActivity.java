@@ -1,12 +1,10 @@
 package com.example.datastorage.Activities;
 
 import static com.example.datastorage.Utils.Helper.SHARED_PREF_KEY;
-import static com.example.datastorage.Utils.Helper.TAG;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,7 +22,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Hide title bar from signIn and signup screen.
 
+        //IF user already login once today, Just show a toast
         SharedPreference sharedPreference = new SharedPreference(this);
         String data = sharedPreference.GetSharedPreferenceData(SHARED_PREF_KEY);
         if (!Objects.equals(data, "")) {
@@ -34,16 +35,10 @@ public class MainActivity extends AppCompatActivity {
                 result = DateUtils.isToday(formattedDate.getTime());
             } catch (ParseException e) {
             }
-        }
 
-        if (result) {
-            Intent intent = new Intent(this, DashboardActivity.class);
-            this.finish();
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        } else {
-            setContentView(R.layout.activity_main);
-            Objects.requireNonNull(getSupportActionBar()).hide(); //Hide title bar from signIn and signup screen.
+        }
+        if (!result) {
+            Toast.makeText(getApplicationContext(), "Welcome Back\nHave a good day", Toast.LENGTH_SHORT).show();
         }
     }
 }

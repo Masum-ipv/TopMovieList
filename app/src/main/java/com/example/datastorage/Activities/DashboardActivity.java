@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -33,12 +34,15 @@ public class DashboardActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MovieListViewModel movieListViewModel;
     private TopMovieListAdapter topMovieListAdapter;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         recyclerView = findViewById(R.id.recycleView);
+        progressBar = findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.VISIBLE);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
@@ -48,6 +52,7 @@ public class DashboardActivity extends AppCompatActivity {
             public void onChanged(List<Result> results) {
                 topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
                 recyclerView.setAdapter(topMovieListAdapter);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
