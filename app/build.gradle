@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'androidx.navigation.safeargs'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -53,6 +54,10 @@ dependencies {
 
     implementation 'androidx.navigation:navigation-fragment:2.7.3'
     implementation 'androidx.navigation:navigation-ui:2.7.3'
+
+    // Hilt Dagger
+    implementation 'com.google.dagger:hilt-android:2.48'
+    annotationProcessor 'com.google.dagger:hilt-compiler:2.48'
 
     // Fix Duplicate class
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))

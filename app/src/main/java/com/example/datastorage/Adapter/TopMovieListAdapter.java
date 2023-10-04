@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.example.datastorage.Models.Result;
 import com.example.datastorage.R;
 
@@ -21,10 +22,12 @@ import java.util.List;
 public class TopMovieListAdapter extends RecyclerView.Adapter<TopMovieListAdapter.MyViewHolder> {
     private Context context;
     private List<Result> mList;
+    private RequestManager glide;
 
-    public TopMovieListAdapter(Context context, List<Result> mList) {
+    public TopMovieListAdapter(Context context, List<Result> mList, RequestManager glide) {
         this.context = context;
         this.mList = mList;
+        this.glide = glide;
     }
 
     @NonNull
@@ -41,7 +44,7 @@ public class TopMovieListAdapter extends RecyclerView.Adapter<TopMovieListAdapte
         holder.mReleaseDate.setText("Release Date: " + mList.get(position).getReleaseDate());
 
         String imagePath = IMAGE_PATH + mList.get(position).getPosterPath();
-        Glide.with(context).load(imagePath).into(holder.mImageView);
+        glide.load(imagePath).into(holder.mImageView);
     }
 
     @Override

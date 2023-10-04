@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.RequestManager;
 import com.example.datastorage.Adapter.TopMovieListAdapter;
 import com.example.datastorage.Models.Result;
 import com.example.datastorage.R;
@@ -29,6 +30,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DashboardActivity extends AppCompatActivity {
 
     //    String roomDbName = "userRoomDb", userInput = "";
@@ -38,6 +44,9 @@ public class DashboardActivity extends AppCompatActivity {
     private TopMovieListAdapter topMovieListAdapter;
     private ProgressBar progressBar;
 
+    @Inject
+    RequestManager requestManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,14 +54,14 @@ public class DashboardActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycleView);
         progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
         movieListViewModel = new ViewModelProvider(this).get(MovieListViewModel.class);
         movieListViewModel.getTopRatedMovieList().observe(this, new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
+                topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results, requestManager);
                 recyclerView.setAdapter(topMovieListAdapter);
                 progressBar.setVisibility(View.GONE);
             }
