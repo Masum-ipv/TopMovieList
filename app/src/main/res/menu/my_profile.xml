@@ -3,8 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/search"
+        android:icon="@drawable/baseline_search_24"
+        android:title="Search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="collapseActionView|always" />
+    <item
         android:id="@+id/myProfileBtn"
         android:icon="@mipmap/profile"
-        app:showAsAction="always"
         android:title="My Profile" />
 </menu>

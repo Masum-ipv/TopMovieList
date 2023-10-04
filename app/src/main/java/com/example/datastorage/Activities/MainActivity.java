@@ -2,6 +2,7 @@ package com.example.datastorage.Activities;
 
 import static com.example.datastorage.Utils.Helper.SHARED_PREF_KEY;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.widget.Toast;
@@ -39,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (!result) {
             Toast.makeText(getApplicationContext(), "Welcome Back\nHave a good day", Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(this, DashboardActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
     }
 }

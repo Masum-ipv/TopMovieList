@@ -26,6 +26,8 @@ public class MovieRepository {
     private static MovieDao movieDao;
     private List<Result> mResult;
     private MutableLiveData<List<Result>> mutableLiveData = new MutableLiveData<>();
+    private String mQuery;
+    private int mPageNumber;
 
     public MovieRepository(Application application) {
         this.application = application;
@@ -55,6 +57,36 @@ public class MovieRepository {
         });
 
         return mutableLiveData;
+    }
+
+    public MutableLiveData<List<Result>> searchMovieApi(String query, int pageNumber) {
+        mQuery = query;
+        mPageNumber = pageNumber;
+
+        ApiServices apiServices = RetrofitInstance.getRetrofitInstance();
+        Call<MovieModel> call = apiServices.searchMovieApi(query, pageNumber);
+        call.enqueue(new Callback<MovieModel>() {
+            @Override
+            public void onResponse(Call<MovieModel> call, Response<MovieModel> response) {
+                MovieModel movieModel = response.body();
+                if (movieModel != null && movieModel.getResults() != null) {
+                    mResult = movieModel.getResults();
+                    mutableLiveData.postValue(mResult);
+                }
+//                new insertAsyncTask(movieDao).execute(mResult);
+            }
+
+            @Override
+            public void onFailure(Call<MovieModel> call, Throwable t) {
+//                Log.d("MovieRepository", "Calling Room-database");
+//                new getAsyncTask(movieDao).execute();//On failure calling local room-database
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<List<Result>> searchNextPage() {
+        return searchMovieApi(mQuery, mPageNumber + 1);
     }
 
     public void insertTopRatedMovieListDB(List<Result> results) {

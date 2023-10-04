@@ -11,7 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -56,6 +58,28 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
+        //TODO: Need to handle 2 API call seperatly, insert new value in mutable data, handle the last page
+        //RecyclerView Pagination
+        //Loading next page of pagination
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                if(!recyclerView.canScrollVertically(1)){
+//                    //Display next page result
+//                    movieListViewModel.searchNextPage()
+//                            .observe(DashboardActivity.this, new Observer<List<Result>>() {
+//                                @Override
+//                                public void onChanged(List<Result> results) {
+//                                    topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
+//                                    recyclerView.setAdapter(topMovieListAdapter);
+//                                    progressBar.setVisibility(View.GONE);
+//                                }
+//                            });
+//
+//                }
+//            }
+//        });
+
 /*        showData(roomDbText);
         roomDbBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,15 +93,40 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_profile, menu);
-        MenuItem menuItem = menu.findItem(R.id.myProfileBtn);
-        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                startActivity(new Intent(getApplicationContext(), MyProfileActivity.class));
-                return false;
-            }
-        });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.myProfileBtn) {
+            startActivity(new Intent(getApplicationContext(), MyProfileActivity.class));
+            return false;
+        } else if (item.getItemId() == R.id.search) {
+            SearchView searchView = (SearchView) item.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    movieListViewModel.searchMovieApi(query, 1)
+                            .observe(DashboardActivity.this, new Observer<List<Result>>() {
+                                @Override
+                                public void onChanged(List<Result> results) {
+//                                    topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
+//                                    recyclerView.setAdapter(topMovieListAdapter);
+//                                    progressBar.setVisibility(View.GONE);
+                                }
+                            });
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            });
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
