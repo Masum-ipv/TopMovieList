@@ -17,14 +17,15 @@ import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.example.datastorage.Adapter.TopMovieListAdapter;
-import com.example.datastorage.Models.Result;
+import com.example.datastorage.Models.Movie;
 import com.example.datastorage.R;
+import com.example.datastorage.Utils.MovieComparator;
 import com.example.datastorage.Utils.SharedPreference;
 import com.example.datastorage.ViewModel.MovieListViewModel;
+import com.example.datastorage.databinding.ActivityDashboardBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,12 +38,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class DashboardActivity extends AppCompatActivity {
 
-    //    String roomDbName = "userRoomDb", userInput = "";
+    String roomDbName = "userRoomDb", userInput = "";
     SharedPreference sharedPreference = new SharedPreference(this);
-    private RecyclerView recyclerView;
-    private MovieListViewModel movieListViewModel;
-    private TopMovieListAdapter topMovieListAdapter;
-    private ProgressBar progressBar;
+    private ActivityDashboardBinding binding;
+    private MovieListViewModel mainActivityViewModel;
+    private TopMovieListAdapter moviesAdapter;
 
     @Inject
     RequestManager requestManager;
@@ -51,43 +51,20 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        recyclerView = findViewById(R.id.recycleView);
-        progressBar = findViewById(R.id.progressbar);
-        progressBar.setVisibility(View.VISIBLE);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(gridLayoutManager);
+        binding = ActivityDashboardBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        movieListViewModel = new ViewModelProvider(this).get(MovieListViewModel.class);
-        movieListViewModel.getTopRatedMovieList().observe(this, new Observer<List<Result>>() {
-            @Override
-            public void onChanged(List<Result> results) {
-                topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results, requestManager);
-                recyclerView.setAdapter(topMovieListAdapter);
-                progressBar.setVisibility(View.GONE);
-            }
+        moviesAdapter = new TopMovieListAdapter(new MovieComparator(), requestManager);
+
+        mainActivityViewModel = new ViewModelProvider(this).get(MovieListViewModel.class);
+
+        initRecyclerviewAndAdapter();
+
+        // Subscribe to to paging data
+        mainActivityViewModel.moviePagingDataFlowable.subscribe(moviePagingData -> {
+            // submit new data to recyclerview adapter
+            moviesAdapter.submitData(getLifecycle(), moviePagingData);
         });
-
-        //TODO: Need to handle 2 API call seperatly, insert new value in mutable data, handle the last page
-        //RecyclerView Pagination
-        //Loading next page of pagination
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                if(!recyclerView.canScrollVertically(1)){
-//                    //Display next page result
-//                    movieListViewModel.searchNextPage()
-//                            .observe(DashboardActivity.this, new Observer<List<Result>>() {
-//                                @Override
-//                                public void onChanged(List<Result> results) {
-//                                    topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
-//                                    recyclerView.setAdapter(topMovieListAdapter);
-//                                    progressBar.setVisibility(View.GONE);
-//                                }
-//                            });
-//
-//                }
-//            }
-//        });
 
 /*        showData(roomDbText);
         roomDbBtn.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +74,12 @@ public class DashboardActivity extends AppCompatActivity {
                 new roomThread().start();
             }
         });*/
+    }
+
+    private void initRecyclerviewAndAdapter() {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        binding.recycleView.setLayoutManager(gridLayoutManager);
+        binding.recycleView.setAdapter(moviesAdapter);
     }
 
     @Override
@@ -115,16 +98,15 @@ public class DashboardActivity extends AppCompatActivity {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    movieListViewModel.searchMovieApi(query, 1)
-                            .observe(DashboardActivity.this, new Observer<List<Result>>() {
-                                @Override
-                                public void onChanged(List<Result> results) {
-//                                    topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
-//                                    recyclerView.setAdapter(topMovieListAdapter);
-//                                    progressBar.setVisibility(View.GONE);
-                                }
-                            });
+//                    mainActivityViewModel.searchMovieApi(query, 1)
+//                            .observe(DashboardActivity.this, new Observer<List<Movie>>() {
+//                                @Override
+//                                public void onChanged(List<Movie> movies) {
+////                                    topMovieListAdapter = new TopMovieListAdapter(DashboardActivity.this, results);
+////                                    recyclerView.setAdapter(topMovieListAdapter);
+////                                    progressBar.setVisibility(View.GONE);
+//                                }
+//                            });
                     return false;
                 }
 
@@ -147,8 +129,12 @@ public class DashboardActivity extends AppCompatActivity {
         sharedPreference.SaveSharedPreference(SHARED_PREF_KEY, String.valueOf(result));
     }
 
-/*    private void showData(EditText editText) {
-        AppDatabase database = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, roomDbName).allowMainThreadQueries().build();
+    //TODO: Use dependency injection for Room Database
+/*
+   private void showData(EditText editText) {
+        AppDatabase database = Room.databaseBuilder(
+                getApplicationContext(), AppDatabase.class, roomDbName)
+                .allowMainThreadQueries().build();
         UserDao userDao = database.userDao();
 
         int size = userDao.getUserData().size();

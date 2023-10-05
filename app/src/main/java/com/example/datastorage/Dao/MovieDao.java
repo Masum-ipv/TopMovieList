@@ -1,12 +1,10 @@
 package com.example.datastorage.Dao;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.example.datastorage.Models.Result;
+import com.example.datastorage.Models.Movie;
 
 import java.util.List;
 
@@ -14,8 +12,8 @@ import java.util.List;
 public interface MovieDao {
 
     @Insert
-    void insert(List<Result> results);
+    void insert(List<Movie> movies);
 
-    @Query("SELECT * FROM movie_table")
-    List<Result> getAllMovies();
+    //@Query("SELECT * FROM Movie")
+    //List<Movie> getAllMovies();
 }

@@ -7,9 +7,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.example.datastorage.Dao.MovieDao;
-import com.example.datastorage.Models.Result;
+import com.example.datastorage.Models.Movie;
 
-@Database(entities = {Result.class}, version = 1)
+@Database(entities = {Movie.class}, version = 1)
 public abstract class MovieDatabase extends RoomDatabase {
 
     public abstract MovieDao movieDao();

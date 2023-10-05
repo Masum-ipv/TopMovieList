@@ -8,6 +8,11 @@ plugins {
 android {
     compileSdk 34
 
+    buildFeatures {
+        viewBinding true
+    }
+
+
     defaultConfig {
         applicationId "com.example.datastorage"
         minSdk 24
@@ -61,4 +66,14 @@ dependencies {
 
     // Fix Duplicate class
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+
+    def paging_version = "3.0.0-beta01"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    // RxJava3 support for paging library
+    implementation "androidx.paging:paging-rxjava3:$paging_version"
+    // Retrofit support adapter for RxJava
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
+    //OkHttp logging interceptor
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

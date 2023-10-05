@@ -5,13 +5,13 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class MovieModel {
+public class MovieResponse {
     @SerializedName("page")
     @Expose
     private Integer page;
     @SerializedName("results")
     @Expose
-    private List<Result> results = null;
+    private List<Movie> movies = null;
     @SerializedName("total_pages")
     @Expose
     private Integer totalPages;
@@ -27,12 +27,12 @@ public class MovieModel {
         this.page = page;
     }
 
-    public List<Result> getResults() {
-        return results;
+    public List<Movie> getResults() {
+        return movies;
     }
 
-    public void setResults(List<Result> results) {
-        this.results = results;
+    public void setResults(List<Movie> movies) {
+        this.movies = movies;
     }
 
     public Integer getTotalPages() {
@@ -51,4 +51,10 @@ public class MovieModel {
         this.totalResults = totalResults;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) return false;
+        if (other == this) return true;
+        return false;
+    }
 }

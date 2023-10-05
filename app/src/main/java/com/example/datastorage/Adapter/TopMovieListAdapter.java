@@ -2,66 +2,62 @@ package com.example.datastorage.Adapter;
 
 import static com.example.datastorage.Utils.Helper.IMAGE_PATH;
 
-import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagingDataAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.example.datastorage.Models.Result;
-import com.example.datastorage.R;
+import com.example.datastorage.Models.Movie;
+import com.example.datastorage.databinding.MovieSingleRowBinding;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class TopMovieListAdapter extends RecyclerView.Adapter<TopMovieListAdapter.MyViewHolder> {
-    private Context context;
-    private List<Result> mList;
+public class TopMovieListAdapter extends PagingDataAdapter<Movie, TopMovieListAdapter.MyViewHolder> {
     private RequestManager glide;
+    // Define Loading ViewType
+    public static final int LOADING_ITEM = 0;
+    // Define Movie ViewType
+    public static final int MOVIE_ITEM = 1;
 
-    public TopMovieListAdapter(Context context, List<Result> mList, RequestManager glide) {
-        this.context = context;
-        this.mList = mList;
+    public TopMovieListAdapter(@NotNull DiffUtil.ItemCallback<Movie> diffCallBack, RequestManager glide) {
+        super(diffCallBack);
         this.glide = glide;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.movie_single_row, parent, false);
-        return new MyViewHolder(view);
+        MovieSingleRowBinding binding = MovieSingleRowBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
+        return new MyViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.mTitle.setText(mList.get(position).getTitle());
-        holder.mRating.setText("Rating: " + mList.get(position).getVoteAverage().toString());
-        holder.mReleaseDate.setText("Release Date: " + mList.get(position).getReleaseDate());
+        Movie movie = getItem(position);
+        holder.movieItemBinding.movieTitle.setText(movie.getTitle());
+        holder.movieItemBinding.movieRating.setText("Rating: " + movie.getVoteAverage().toString());
+        holder.movieItemBinding.movieReleaseDate.setText("Release Date: " + movie.getReleaseDate());
 
-        String imagePath = IMAGE_PATH + mList.get(position).getPosterPath();
-        glide.load(imagePath).into(holder.mImageView);
+        String imagePath = IMAGE_PATH + movie.getPosterPath();
+        glide.load(imagePath).into(holder.movieItemBinding.movieAvatar);
     }
 
     @Override
-    public int getItemCount() {
-        return mList == null ? 0 : mList.size();
+    public int getItemViewType(int position) {
+        return position == getItemCount() ? MOVIE_ITEM : LOADING_ITEM;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView mImageView;
-        TextView mTitle, mRating, mReleaseDate;
+        MovieSingleRowBinding movieItemBinding;
 
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mImageView = itemView.findViewById(R.id.movie_avatar);
-            mTitle = itemView.findViewById(R.id.movie_title);
-            mRating = itemView.findViewById(R.id.movie_rating);
-            mReleaseDate = itemView.findViewById(R.id.movie_release_date);
+        public MyViewHolder(@NonNull MovieSingleRowBinding movieItemBinding) {
+            super(movieItemBinding.getRoot());
+            this.movieItemBinding = movieItemBinding;
         }
     }
 }

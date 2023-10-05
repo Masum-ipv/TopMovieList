@@ -6,10 +6,8 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 @Entity(tableName = "movie_table")
-public class Result {
+public class Movie {
 
     @PrimaryKey(autoGenerate = true)
     private int pID;
